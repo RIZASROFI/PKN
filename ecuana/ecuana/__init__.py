@@ -1,0 +1,1 @@
+# ecuana project initialization

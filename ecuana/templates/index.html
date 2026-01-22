@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Cuaca | Monitoring Cuaca Desa Sumberejo</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🌤️</text></svg>">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1 class="title">E-Cuaca</h1>
+            <p class="subtitle">Sistem Monitoring Cuaca Real-Time</p>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Location Info Card -->
+            <div class="card location-card">
+                <div class="location-header">
+                    <h2>📍 Lokasi Monitoring</h2>
+                </div>
+                <div class="location-content">
+                    <p class="location-name">{{ weather.location_name }}</p>
+                    <p class="location-full">{{ weather.location_full }}</p>
+                </div>
+            </div>
+
+            <!-- Weather Status -->
+            {% if weather.error %}
+                <!-- Error State -->
+                <div class="card error-card">
+                    <div class="error-content">
+                        <h3>⚠️ Terjadi Kesalahan</h3>
+                        <p class="error-message">{{ weather.error }}</p>
+                        <p class="error-hint">
+                            <strong>Tips:</strong>
+                            <ul>
+                                <li>Periksa koneksi internet Anda</li>
+                                <li>Pastikan API Key OpenWeatherMap sudah benar</li>
+                                <li>Buka <code>cuaca/views.py</code> dan ganti <code>YOUR_API_KEY_HERE</code></li>
+                                <li><a href="https://openweathermap.org/api" target="_blank">Daftar di OpenWeatherMap →</a></li>
+                            </ul>
+                        </p>
+                    </div>
+                </div>
+            {% else %}
+                <!-- Weather Info - Main Card -->
+                <div class="card weather-main-card">
+                    <div class="weather-emoji-container">
+                        <div class="weather-emoji">{{ weather.weather_emoji }}</div>
+                    </div>
+                    
+                    <div class="weather-main-info">
+                        <div class="temperature-section">
+                            <div class="temperature-display">
+                                <span class="temp-value">{{ weather.temperature }}</span>
+                                <span class="temp-unit">°C</span>
+                            </div>
+                            <p class="feels-like">Terasa seperti {{ weather.feels_like }}°C</p>
+                        </div>
+                        
+                        <div class="condition-section">
+                            <h3 class="condition-text">{{ weather.condition }}</h3>
+                            <p class="description">{{ weather.description }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weather Details Grid -->
+                <div class="weather-grid">
+                    <!-- Humidity Card -->
+                    <div class="card stat-card">
+                        <div class="stat-icon">💧</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Kelembaban</h3>
+                            <p class="stat-value">{{ weather.humidity }}%</p>
+                            <p class="stat-description">
+                                {% if weather.humidity > 80 %}
+                                    Sangat lembab
+                                {% elif weather.humidity > 60 %}
+                                    Lembab
+                                {% else %}
+                                    Normal
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Wind Speed Card -->
+                    <div class="card stat-card">
+                        <div class="stat-icon">💨</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Kecepatan Angin</h3>
+                            <p class="stat-value">{{ weather.wind_speed }} m/s</p>
+                            <p class="stat-description">
+                                {% if weather.wind_speed > 10 %}
+                                    Angin kuat
+                                {% elif weather.wind_speed > 5 %}
+                                    Angin sedang
+                                {% else %}
+                                    Angin lemah
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Pressure Card -->
+                    <div class="card stat-card">
+                        <div class="stat-icon">🔽</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Tekanan Udara</h3>
+                            <p class="stat-value">{{ weather.pressure }} hPa</p>
+                            <p class="stat-description">
+                                {% if weather.pressure > 1015 %}
+                                    Tinggi
+                                {% else %}
+                                    Rendah
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Cloud Coverage Card -->
+                    <div class="card stat-card">
+                        <div class="stat-icon">☁️</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Tutupan Awan</h3>
+                            <p class="stat-value">{{ weather.cloudiness }}%</p>
+                            <p class="stat-description">
+                                {% if weather.cloudiness > 70 %}
+                                    Sangat berawan
+                                {% elif weather.cloudiness > 40 %}
+                                    Berawan
+                                {% else %}
+                                    Cerah
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Temperature Range Card -->
+                    <div class="card stat-card">
+                        <div class="stat-icon">🌡️</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Suhu Tertinggi</h3>
+                            <p class="stat-value">{{ weather.temperature_max }}°C</p>
+                            <p class="stat-description">
+                                Terendah: {{ weather.temperature_min }}°C
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Visibility Card -->
+                    <div class="card stat-card">
+                        <div class="stat-icon">👁️</div>
+                        <div class="stat-content">
+                            <h3 class="stat-label">Visibilitas</h3>
+                            <p class="stat-value">{{ weather.visibility|floatformat:1 }} km</p>
+                            <p class="stat-description">
+                                {% if weather.visibility > 10 %}
+                                    Sangat jelas
+                                {% elif weather.visibility > 5 %}
+                                    Jelas
+                                {% else %}
+                                    Berkabut
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Last Update -->
+                <div class="card update-card">
+                    <p class="update-text">⏰ Pembaruan terakhir: <strong>{{ weather.update_time }}</strong></p>
+                    <p class="update-refresh">Data diperbarui setiap kali halaman dimuat</p>
+                </div>
+
+            {% endif %}
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p class="footer-text">
+                E-Cuaca © 2026 | Kuliah Kerja Nyata (KKN) Desa Sumberejo<br>
+                <small>Kecamatan Pagelaran, Kabupaten Pringsewu, Lampung</small>
+            </p>
+            <p class="footer-note">
+                Data cuaca diambil dari <a href="https://openweathermap.org" target="_blank">OpenWeatherMap API</a>
+            </p>
+        </footer>
+    </div>
+
+    <!-- Script untuk auto-refresh setiap 10 menit -->
+    <script>
+        // Auto-refresh halaman setiap 10 menit (600000 ms)
+        const AUTO_REFRESH_INTERVAL = 10 * 60 * 1000;
+        
+        setTimeout(function() {
+            location.reload();
+        }, AUTO_REFRESH_INTERVAL);
+
+        // Optional: Tampilkan countdown untuk refresh berikutnya
+        let refreshCountdown = AUTO_REFRESH_INTERVAL / 1000;
+        setInterval(function() {
+            refreshCountdown--;
+            if (refreshCountdown <= 0) {
+                refreshCountdown = AUTO_REFRESH_INTERVAL / 1000;
+            }
+            // Uncomment untuk debug:
+            // console.log('Refresh berikutnya dalam:', Math.floor(refreshCountdown / 60), 'menit');
+        }, 1000);
+    </script>
+</body>
+</html>
