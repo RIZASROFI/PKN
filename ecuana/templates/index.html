@@ -299,56 +299,140 @@
                     </div>
                 </div>
 
-                <!-- Forecast 7 Hari -->
-                <div class="forecast-section">
-                    <h2 class="forecast-title">
-                        <i class="fas fa-calendar-days"></i> Prakiraan Cuaca 7 Hari
-                    </h2>
-                    <div class="forecast-grid">
-                        {% for day in forecast %}
-                            <div class="card forecast-card">
-                                <div class="forecast-header">
-                                    <div class="forecast-day">{{ day.day_name }}</div>
-                                    <div class="forecast-date">{{ day.date }}</div>
-                                </div>
-                                
-                                <div class="forecast-emoji">{{ day.weather_emoji }}</div>
-                                
-                                <div class="forecast-content">
-                                    <p class="forecast-condition">{{ day.condition }}</p>
-                                    <p class="forecast-description">{{ day.description }}</p>
-                                    
-                                    <div class="forecast-temps">
-                                        <div class="temp-item temp-max">
-                                            <i class="fas fa-thermometer-full"></i>
-                                            <span>{{ day.temperature_max }}°C</span>
-                                        </div>
-                                        <div class="temp-item temp-min">
-                                            <i class="fas fa-thermometer-empty"></i>
-                                            <span>{{ day.temperature_min }}°C</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="forecast-details">
-                                        <div class="forecast-detail-item">
-                                            <i class="fas fa-tint"></i>
-                                            <span title="Kelembaban">{{ day.humidity }}%</span>
-                                        </div>
-                                        <div class="forecast-detail-item">
-                                            <i class="fas fa-wind"></i>
-                                            <span title="Kecepatan Angin">{{ day.wind_speed }} m/s</span>
-                                        </div>
-                                        <div class="forecast-detail-item">
-                                            <i class="fas fa-cloud"></i>
-                                            <span title="Tutupan Awan">{{ day.cloudiness }}%</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        {% endfor %}
+<!-- Forecast 7 Hari - Versi Baru -->
+<div class="forecast-section">
+    <div class="section-header">
+        <div class="header-title">
+            <div class="title-icon">
+                <i class="fas fa-calendar-days"></i>
+            </div>
+            <div class="title-text">
+                <h2>Prakiraan Cuaca 7 Hari</h2>
+                <p class="section-subtitle">Ramalan cuaca untuk seminggu ke depan di Desa Sumberejo</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <div class="forecast-navigation">
+                <button class="nav-btn prev-btn" id="forecastPrev">
+                    <i class="fas fa-chevron-left"></i>
+                </button>
+                <button class="nav-btn next-btn" id="forecastNext">
+                    <i class="fas fa-chevron-right"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="forecast-container">
+        <div class="forecast-scroll" id="forecastScroll">
+            {% for day in forecast %}
+            <div class="forecast-day-card">
+                <div class="day-header">
+                    <div class="day-name">{{ day.day_name|upper }}</div>
+                    <div class="day-date">{{ day.date }}</div>
+                </div>
+                
+                <div class="weather-icon-wrapper">
+                    <div class="weather-icon-bg"></div>
+                    <div class="weather-icon">{{ day.weather_emoji }}</div>
+                </div>
+                
+                <div class="temperature-display">
+                    <div class="temp-item">
+                        <span class="temp-value-max">{{ day.temperature_max }}°</span>
+                        <span class="temp-label">Tertinggi</span>
+                    </div>
+                    <div class="temp-separator"></div>
+                    <div class="temp-item">
+                        <span class="temp-value-min">{{ day.temperature_min }}°</span>
+                        <span class="temp-label">Terendah</span>
                     </div>
                 </div>
-
+                
+                <div class="weather-condition">
+                    <span class="condition-text">{{ day.condition }}</span>
+                </div>
+                
+                <div class="weather-details">
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <div class="detail-icon humidity-icon">
+                                <i class="fas fa-droplet"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-value">{{ day.humidity }}%</span>
+                                <span class="detail-label">Kelembaban</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon wind-icon">
+                                <i class="fas fa-wind"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-value">{{ day.wind_speed }} m/s</span>
+                                <span class="detail-label">Angin</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-item">
+                            <div class="detail-icon cloud-icon">
+                                <i class="fas fa-cloud"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-value">{{ day.cloudiness }}%</span>
+                                <span class="detail-label">Awan</span>
+                            </div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-icon rain-icon">
+                                <i class="fas fa-cloud-rain"></i>
+                            </div>
+                            <div class="detail-content">
+                                <span class="detail-value">{{ day.precipitation|floatformat:0 }}%</span>
+                                <span class="detail-label">Hujan</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="day-footer">
+                    <div class="sun-times">
+                        <div class="sun-time sunrise">
+                            <i class="fas fa-sunrise"></i>
+                            <span>{{ day.sunrise|default:"06:00" }}</span>
+                        </div>
+                        <div class="sun-time sunset">
+                            <i class="fas fa-sunset"></i>
+                            <span>{{ day.sunset|default:"18:00" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="forecast-indicator">
+            <div class="indicator-dots" id="forecastDots"></div>
+        </div>
+    </div>
+    
+    <div class="forecast-summary">
+        <div class="summary-card">
+            <div class="summary-icon">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="summary-content">
+                <h3>Ringkasan Mingguan</h3>
+                <p>
+                    Rata-rata suhu: <strong>{{ forecast_summary.avg_temp }}°C</strong> | 
+                    Hari terpanas: <strong>{{ forecast_summary.hottest_day }}</strong> | 
+                    Curah hujan: <strong>{{ forecast_summary.total_rainfall }}mm</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
                 <!-- Last Update -->
                 <div class="card update-card">
                     <div class="update-content">
@@ -405,7 +489,90 @@
 
     <!-- Script untuk auto-refresh dan interaksi -->
     <script>
-        // Auto-refresh halaman setiap 10 menit (600000 ms)
+        // ========== Forecast Navigation ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi forecast navigation
+            initForecastNavigation();
+            
+            // Set precipitation bar width
+            const precipitationCards = document.querySelectorAll('.precipitation-chance');
+            precipitationCards.forEach(card => {
+                const chance = parseFloat(card.dataset.chance) || 0;
+                const fill = card.querySelector('.precipitation-fill');
+                if (fill) {
+                    fill.style.setProperty('--rain-chance', `${chance}%`);
+                }
+            });
+        });
+        
+        function initForecastNavigation() {
+            const forecastScroll = document.getElementById('forecastScroll');
+            const forecastDots = document.getElementById('forecastDots');
+            const prevBtn = document.getElementById('forecastPrev');
+            const nextBtn = document.getElementById('forecastNext');
+            
+            if (!forecastScroll) return;
+            
+            const cards = forecastScroll.querySelectorAll('.forecast-day-card');
+            const cardWidth = cards[0]?.offsetWidth + 20; // 20px gap
+            
+            // Create indicator dots
+            cards.forEach((_, index) => {
+                const dot = document.createElement('div');
+                dot.className = 'dot';
+                if (index === 0) dot.classList.add('active');
+                
+                dot.addEventListener('click', () => {
+                    forecastScroll.scrollLeft = index * cardWidth;
+                    updateDots();
+                });
+                
+                forecastDots.appendChild(dot);
+            });
+            
+            // Update dots on scroll
+            forecastScroll.addEventListener('scroll', updateDots);
+            
+            function updateDots() {
+                const dots = forecastDots.querySelectorAll('.dot');
+                const scrollLeft = forecastScroll.scrollLeft;
+                const activeIndex = Math.round(scrollLeft / cardWidth);
+                
+                dots.forEach((dot, index) => {
+                    dot.classList.toggle('active', index === activeIndex);
+                });
+                
+                // Update button states
+                updateButtonStates();
+            }
+            
+            function updateButtonStates() {
+                const scrollLeft = forecastScroll.scrollLeft;
+                const maxScroll = forecastScroll.scrollWidth - forecastScroll.clientWidth;
+                
+                prevBtn.disabled = scrollLeft <= 0;
+                nextBtn.disabled = scrollLeft >= maxScroll - 10;
+            }
+            
+            // Navigation button click handlers
+            prevBtn.addEventListener('click', () => {
+                forecastScroll.scrollLeft -= cardWidth;
+            });
+            
+            nextBtn.addEventListener('click', () => {
+                forecastScroll.scrollLeft += cardWidth;
+            });
+            
+            // Initial state
+            updateButtonStates();
+            
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                updateButtonStates();
+            });
+        }
+        
+        // ========== Auto-Refresh dan Countdown ==========
         const AUTO_REFRESH_INTERVAL = 10 * 60 * 1000;
         let refreshCountdown = AUTO_REFRESH_INTERVAL / 1000;
         let countdownInterval;

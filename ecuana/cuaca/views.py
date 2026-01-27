@@ -142,6 +142,9 @@ def parse_forecast_data(api_data):
                 weather_code = weather.get('icon', '01d')
                 weather_emoji = weather_icon_map.get(weather_code, '🌡️')
                 
+                # Hitung rata-rata temperatur
+                temp_avg = round((main.get('temp_min', 0) + main.get('temp_max', 0)) / 2)
+                
                 daily_forecasts[date_str] = {
                     'date': dt_obj.strftime('%a, %d %b'),  # Format: Mon, 27 Jan
                     'day_name': dt_obj.strftime('%A'),  # Format: Monday
@@ -150,6 +153,7 @@ def parse_forecast_data(api_data):
                     'temperature': round(main.get('temp', 0)),
                     'temperature_min': round(main.get('temp_min', 0)),
                     'temperature_max': round(main.get('temp_max', 0)),
+                    'temperature_avg': temp_avg,
                     'feels_like': round(main.get('feels_like', 0)),
                     'humidity': main.get('humidity', 0),
                     'pressure': main.get('pressure', 0),
@@ -159,7 +163,10 @@ def parse_forecast_data(api_data):
                     'wind_degree': wind.get('deg', 0),
                     'cloudiness': item.get('clouds', {}).get('all', 0),
                     'rain': item.get('rain', {}).get('3h', 0),
+                    'precipitation': round(item.get('pop', 0) * 100),  # Convert to percentage and round
                     'weather_emoji': weather_emoji,
+                    'sunrise': '06:00',  # Will be updated from API if available
+                    'sunset': '18:00',   # Will be updated from API if available
                 }
         
         # Urutkan berdasarkan tanggal dan ambil 7 hari pertama
@@ -269,10 +276,33 @@ def index(request):
     forecast_api_data = get_forecast_data()
     forecast_data = parse_forecast_data(forecast_api_data)
     
+    # Hitung forecast summary
+    forecast_summary = {
+        'avg_temp': '-',
+        'hottest_day': '-',
+        'total_rainfall': '0'
+    }
+    
+    if forecast_data:
+        # Hitung rata-rata suhu
+        temps = [f.get('temperature_avg', 0) for f in forecast_data]
+        avg_temp = round(sum(temps) / len(temps)) if temps else 0
+        forecast_summary['avg_temp'] = avg_temp
+        
+        # Cari hari terpanas
+        hottest = max(forecast_data, key=lambda x: x.get('temperature_max', 0), default=None)
+        if hottest:
+            forecast_summary['hottest_day'] = f"{hottest['day_name']} ({hottest['temperature_max']}°C)"
+        
+        # Hitung total curah hujan
+        total_rain = sum([f.get('rain', 0) for f in forecast_data])
+        forecast_summary['total_rainfall'] = f"{total_rain:.1f}"
+    
     # Context untuk template
     context = {
         'weather': weather_data,
         'forecast': forecast_data,
+        'forecast_summary': forecast_summary,
         'api_status': 'connected' if not weather_data.get('error') else 'error',
     }
     
