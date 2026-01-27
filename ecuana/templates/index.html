@@ -6,16 +6,38 @@
     <title>E-Cuaca | Monitoring Cuaca Desa Sumberejo</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Favicon -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🌤️</text></svg>">
 </head>
 <body>
+    <!-- Background Animation -->
+    <div class="background-animation">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="sun"></div>
+    </div>
+
     <div class="container">
         <!-- Header -->
         <header class="header">
-            <h1 class="title">E-Cuaca</h1>
-            <p class="subtitle">Sistem Monitoring Cuaca Real-Time</p>
+            <div class="header-content">
+                <div class="logo-container">
+                    <div class="logo-icon">🌤️</div>
+                    <div class="logo-text">
+                        <h1 class="title">E-Cuaca</h1>
+                        <p class="subtitle">Sistem Monitoring Cuaca Real-Time</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <div class="refresh-info" id="refreshCountdown">
+                        <i class="fas fa-sync-alt"></i>
+                        <span>Refresh dalam: <span id="countdown">10:00</span></span>
+                    </div>
+                </div>
+            </div>
         </header>
 
         <!-- Main Content -->
@@ -23,30 +45,53 @@
             <!-- Location Info Card -->
             <div class="card location-card">
                 <div class="location-header">
-                    <h2>📍 Lokasi Monitoring</h2>
+                    <h2><i class="fas fa-map-marker-alt"></i> Lokasi Monitoring</h2>
                 </div>
                 <div class="location-content">
-                    <p class="location-name">{{ weather.location_name }}</p>
-                    <p class="location-full">{{ weather.location_full }}</p>
+                    <div class="location-icon">
+                        <i class="fas fa-location-dot"></i>
+                    </div>
+                    <div class="location-details">
+                        <p class="location-name">
+                            <i class="fas fa-map-marker-alt"></i> 
+                            Desa Sumberejo, Kecamatan Pagelaran, Kabupaten Pringsewu, Provinsi Lampung
+                        </p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Weather Status -->
             {% if weather.error %}
                 <!-- Error State -->
                 <div class="card error-card">
+                    <div class="error-header">
+                        <div class="error-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <h3>Terjadi Kesalahan</h3>
+                    </div>
                     <div class="error-content">
-                        <h3>⚠️ Terjadi Kesalahan</h3>
                         <p class="error-message">{{ weather.error }}</p>
-                        <p class="error-hint">
-                            <strong>Tips:</strong>
-                            <ul>
-                                <li>Periksa koneksi internet Anda</li>
-                                <li>Pastikan API Key OpenWeatherMap sudah benar</li>
-                                <li>Buka <code>cuaca/views.py</code> dan ganti <code>YOUR_API_KEY_HERE</code></li>
-                                <li><a href="https://openweathermap.org/api" target="_blank">Daftar di OpenWeatherMap →</a></li>
+                        <div class="error-solutions">
+                            <h4><i class="fas fa-lightbulb"></i> Solusi Pemecahan Masalah:</h4>
+                            <ul class="solution-list">
+                                <li>
+                                    <i class="fas fa-wifi"></i>
+                                    <span>Periksa koneksi internet Anda</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-key"></i>
+                                    <span>Pastikan API Key OpenWeatherMap sudah benar</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-code"></i>
+                                    <span>Buka <code>cuaca/views.py</code> dan ganti <code>YOUR_API_KEY_HERE</code></span>
+                                </li>
                             </ul>
-                        </p>
+                            <a href="https://openweathermap.org/api" target="_blank" class="api-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                Daftar di OpenWeatherMap untuk mendapatkan API Key
+                            </a>
+                        </div>
                     </div>
                 </div>
             {% else %}
@@ -54,6 +99,7 @@
                 <div class="card weather-main-card">
                     <div class="weather-emoji-container">
                         <div class="weather-emoji">{{ weather.weather_emoji }}</div>
+                        <div class="weather-emoji-bg"></div>
                     </div>
                     
                     <div class="weather-main-info">
@@ -62,12 +108,25 @@
                                 <span class="temp-value">{{ weather.temperature }}</span>
                                 <span class="temp-unit">°C</span>
                             </div>
-                            <p class="feels-like">Terasa seperti {{ weather.feels_like }}°C</p>
+                            <div class="temperature-feel">
+                                <i class="fas fa-temperature-half"></i>
+                                <span>Terasa seperti <strong>{{ weather.feels_like }}°C</strong></span>
+                            </div>
                         </div>
                         
                         <div class="condition-section">
                             <h3 class="condition-text">{{ weather.condition }}</h3>
                             <p class="description">{{ weather.description }}</p>
+                            <div class="condition-details">
+                                <span class="detail-item">
+                                    <i class="fas fa-sun"></i>
+                                    <span>Siang: {{ weather.temperature_max }}°C</span>
+                                </span>
+                                <span class="detail-item">
+                                    <i class="fas fa-moon"></i>
+                                    <span>Malam: {{ weather.temperature_min }}°C</span>
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -75,100 +134,163 @@
                 <!-- Weather Details Grid -->
                 <div class="weather-grid">
                     <!-- Humidity Card -->
-                    <div class="card stat-card">
-                        <div class="stat-icon">💧</div>
+                    <div class="card stat-card humidity">
+                        <div class="stat-icon">
+                            <i class="fas fa-tint"></i>
+                            <div class="icon-bg"></div>
+                        </div>
                         <div class="stat-content">
                             <h3 class="stat-label">Kelembaban</h3>
-                            <p class="stat-value">{{ weather.humidity }}%</p>
+                            <div class="stat-value-container">
+                                <p class="stat-value">{{ weather.humidity }}<span class="unit">%</span></p>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: {{ weather.humidity }}%"></div>
+                                </div>
+                            </div>
                             <p class="stat-description">
                                 {% if weather.humidity > 80 %}
-                                    Sangat lembab
+                                    <i class="fas fa-exclamation-circle"></i> Sangat lembab
                                 {% elif weather.humidity > 60 %}
-                                    Lembab
+                                    <i class="fas fa-check-circle"></i> Lembab
                                 {% else %}
-                                    Normal
+                                    <i class="fas fa-check-circle"></i> Normal
                                 {% endif %}
                             </p>
                         </div>
                     </div>
 
                     <!-- Wind Speed Card -->
-                    <div class="card stat-card">
-                        <div class="stat-icon">💨</div>
+                    <div class="card stat-card wind">
+                        <div class="stat-icon">
+                            <i class="fas fa-wind"></i>
+                            <div class="icon-bg"></div>
+                        </div>
                         <div class="stat-content">
                             <h3 class="stat-label">Kecepatan Angin</h3>
-                            <p class="stat-value">{{ weather.wind_speed }} m/s</p>
+                            <div class="stat-value-container">
+                                <p class="stat-value">{{ weather.wind_speed }}<span class="unit"> m/s</span></p>
+                                <div class="wind-direction">
+                                    <i class="fas fa-arrow-up" style="transform: rotate({{ weather.wind_deg|default:0 }}deg)"></i>
+                                    <span>{{ weather.wind_deg|default:0 }}°</span>
+                                </div>
+                            </div>
                             <p class="stat-description">
                                 {% if weather.wind_speed > 10 %}
-                                    Angin kuat
+                                    <i class="fas fa-exclamation-circle"></i> Angin kuat
                                 {% elif weather.wind_speed > 5 %}
-                                    Angin sedang
+                                    <i class="fas fa-check-circle"></i> Angin sedang
                                 {% else %}
-                                    Angin lemah
+                                    <i class="fas fa-check-circle"></i> Angin lemah
                                 {% endif %}
                             </p>
                         </div>
                     </div>
 
                     <!-- Pressure Card -->
-                    <div class="card stat-card">
-                        <div class="stat-icon">🔽</div>
+                    <div class="card stat-card pressure">
+                        <div class="stat-icon">
+                            <i class="fas fa-gauge-high"></i>
+                            <div class="icon-bg"></div>
+                        </div>
                         <div class="stat-content">
                             <h3 class="stat-label">Tekanan Udara</h3>
-                            <p class="stat-value">{{ weather.pressure }} hPa</p>
+                            <div class="stat-value-container">
+                                <p class="stat-value">{{ weather.pressure }}<span class="unit"> hPa</span></p>
+                                <div class="pressure-indicator">
+                                    <div class="indicator-dot {% if weather.pressure > 1015 %}high{% else %}low{% endif %}"></div>
+                                    <span class="indicator-label">
+                                        {% if weather.pressure > 1015 %}
+                                            Tinggi
+                                        {% else %}
+                                            Rendah
+                                        {% endif %}
+                                    </span>
+                                </div>
+                            </div>
                             <p class="stat-description">
-                                {% if weather.pressure > 1015 %}
-                                    Tinggi
-                                {% else %}
-                                    Rendah
-                                {% endif %}
+                                Tekanan atmosfer saat ini
                             </p>
                         </div>
                     </div>
 
                     <!-- Cloud Coverage Card -->
-                    <div class="card stat-card">
-                        <div class="stat-icon">☁️</div>
+                    <div class="card stat-card clouds">
+                        <div class="stat-icon">
+                            <i class="fas fa-cloud"></i>
+                            <div class="icon-bg"></div>
+                        </div>
                         <div class="stat-content">
                             <h3 class="stat-label">Tutupan Awan</h3>
-                            <p class="stat-value">{{ weather.cloudiness }}%</p>
+                            <div class="stat-value-container">
+                                <p class="stat-value">{{ weather.cloudiness }}<span class="unit">%</span></p>
+                                <div class="cloud-visual">
+                                    <div class="cloud-visual-bg">
+                                        {% for i in "12345" %}
+                                            <div class="cloud-dot {% if forloop.counter <= weather.cloudiness|divisibleby:20 %}filled{% endif %}"></div>
+                                        {% endfor %}
+                                    </div>
+                                </div>
+                            </div>
                             <p class="stat-description">
                                 {% if weather.cloudiness > 70 %}
-                                    Sangat berawan
+                                    <i class="fas fa-cloud"></i> Sangat berawan
                                 {% elif weather.cloudiness > 40 %}
-                                    Berawan
+                                    <i class="fas fa-cloud-sun"></i> Berawan
                                 {% else %}
-                                    Cerah
+                                    <i class="fas fa-sun"></i> Cerah
                                 {% endif %}
                             </p>
                         </div>
                     </div>
 
                     <!-- Temperature Range Card -->
-                    <div class="card stat-card">
-                        <div class="stat-icon">🌡️</div>
+                    <div class="card stat-card temperature-range">
+                        <div class="stat-icon">
+                            <i class="fas fa-thermometer-half"></i>
+                            <div class="icon-bg"></div>
+                        </div>
                         <div class="stat-content">
-                            <h3 class="stat-label">Suhu Tertinggi</h3>
-                            <p class="stat-value">{{ weather.temperature_max }}°C</p>
+                            <h3 class="stat-label">Rentang Suhu</h3>
+                            <div class="temp-range-container">
+                                <div class="temp-min">
+                                    <span class="temp-label">Malam</span>
+                                    <span class="temp-value">{{ weather.temperature_min }}°C</span>
+                                </div>
+                                <div class="temp-range-bar">
+                                    <div class="range-fill"></div>
+                                </div>
+                                <div class="temp-max">
+                                    <span class="temp-label">Siang</span>
+                                    <span class="temp-value">{{ weather.temperature_max }}°C</span>
+                                </div>
+                            </div>
                             <p class="stat-description">
-                                Terendah: {{ weather.temperature_min }}°C
+                                <i class="fas fa-info-circle"></i> Rentang: {{ weather.temperature_max|add:weather.temperature_min|floatformat:0 }}°C
                             </p>
                         </div>
                     </div>
 
                     <!-- Visibility Card -->
-                    <div class="card stat-card">
-                        <div class="stat-icon">👁️</div>
+                    <div class="card stat-card visibility">
+                        <div class="stat-icon">
+                            <i class="fas fa-eye"></i>
+                            <div class="icon-bg"></div>
+                        </div>
                         <div class="stat-content">
                             <h3 class="stat-label">Visibilitas</h3>
-                            <p class="stat-value">{{ weather.visibility|floatformat:1 }} km</p>
+                            <div class="stat-value-container">
+                                <p class="stat-value">{{ weather.visibility|floatformat:1 }}<span class="unit"> km</span></p>
+                                <div class="visibility-indicator">
+                                    <div class="indicator-bar {% if weather.visibility > 10 %}excellent{% elif weather.visibility > 5 %}good{% else %}poor{% endif %}"></div>
+                                </div>
+                            </div>
                             <p class="stat-description">
                                 {% if weather.visibility > 10 %}
-                                    Sangat jelas
+                                    <i class="fas fa-check-circle"></i> Sangat jelas
                                 {% elif weather.visibility > 5 %}
-                                    Jelas
+                                    <i class="fas fa-check-circle"></i> Jelas
                                 {% else %}
-                                    Berkabut
+                                    <i class="fas fa-exclamation-circle"></i> Berkabut
                                 {% endif %}
                             </p>
                         </div>
@@ -177,45 +299,122 @@
 
                 <!-- Last Update -->
                 <div class="card update-card">
-                    <p class="update-text">⏰ Pembaruan terakhir: <strong>{{ weather.update_time }}</strong></p>
-                    <p class="update-refresh">Data diperbarui setiap kali halaman dimuat</p>
+                    <div class="update-content">
+                        <div class="update-info">
+                            <div class="update-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="update-details">
+                                <p class="update-text">Pembaruan terakhir: <strong>{{ weather.update_time }}</strong></p>
+                                <p class="update-refresh">Data diperbarui setiap kali halaman dimuat</p>
+                            </div>
+                        </div>
+                        <button class="refresh-btn" id="manualRefresh">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Sekarang
+                        </button>
+                    </div>
                 </div>
-
             {% endif %}
-
         </main>
 
         <!-- Footer -->
         <footer class="footer">
-            <p class="footer-text">
-                E-Cuaca © 2026 | Kuliah Kerja Nyata (KKN) Desa Sumberejo<br>
-                <small>Kecamatan Pagelaran, Kabupaten Pringsewu, Lampung</small>
-            </p>
-            <p class="footer-note">
-                Data cuaca diambil dari <a href="https://openweathermap.org" target="_blank">OpenWeatherMap API</a>
-            </p>
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <div class="footer-logo-icon">🌤️</div>
+                    <div class="footer-logo-text">
+                        <h3>E-Cuaca</h3>
+                        <p>Sistem Monitoring Cuaca</p>
+                    </div>
+                </div>
+                <div class="footer-info">
+                    <p class="footer-text">
+                        <i class="fas fa-graduation-cap"></i> Praktik Kerja Nyata (PKN)
+                    </p>
+                    <p class="footer-text">
+                        <i class="fas fa-building"></i> Politeknik Negeri Lampung
+                    </p>
+                    <p class="footer-text">
+                        <i class="fas fa-map-marker-alt"></i> Desa Sumberejo, Kecamatan Pagelaran, Kabupaten Pringsewu, Lampung
+                    </p>
+                    <p class="footer-note">
+                        <i class="fas fa-database"></i> Data cuaca diambil dari 
+                        <a href="https://openweathermap.org" target="_blank">OpenWeatherMap API</a>
+                    </p>
+                </div>
+                <div class="footer-year">
+                    <p>© 2026 E-Cuaca</p>
+                    <p class="footer-version">v2.1.0</p>
+                </div>
+            </div>
         </footer>
     </div>
 
-    <!-- Script untuk auto-refresh setiap 10 menit -->
+    <!-- Script untuk auto-refresh dan interaksi -->
     <script>
         // Auto-refresh halaman setiap 10 menit (600000 ms)
         const AUTO_REFRESH_INTERVAL = 10 * 60 * 1000;
+        let refreshCountdown = AUTO_REFRESH_INTERVAL / 1000;
+        let countdownInterval;
         
+        // Format waktu dalam menit:detik
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // Update countdown display
+        function updateCountdownDisplay() {
+            document.getElementById('countdown').textContent = formatTime(refreshCountdown);
+        }
+        
+        // Start countdown
+        function startCountdown() {
+            refreshCountdown = AUTO_REFRESH_INTERVAL / 1000;
+            updateCountdownDisplay();
+            
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+            
+            countdownInterval = setInterval(function() {
+                refreshCountdown--;
+                updateCountdownDisplay();
+                
+                if (refreshCountdown <= 0) {
+                    location.reload();
+                }
+            }, 1000);
+        }
+        
+        // Manual refresh
+        document.getElementById('manualRefresh').addEventListener('click', function() {
+            this.classList.add('refreshing');
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memuat...';
+            
+            setTimeout(function() {
+                location.reload();
+            }, 500);
+        });
+        
+        // Start countdown on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            startCountdown();
+            
+            // Add subtle animations to cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.style.animationDelay = `${index * 0.1}s`;
+                card.classList.add('animate-in');
+            });
+        });
+        
+        // Auto-refresh timeout
         setTimeout(function() {
             location.reload();
         }, AUTO_REFRESH_INTERVAL);
-
-        // Optional: Tampilkan countdown untuk refresh berikutnya
-        let refreshCountdown = AUTO_REFRESH_INTERVAL / 1000;
-        setInterval(function() {
-            refreshCountdown--;
-            if (refreshCountdown <= 0) {
-                refreshCountdown = AUTO_REFRESH_INTERVAL / 1000;
-            }
-            // Uncomment untuk debug:
-            // console.log('Refresh berikutnya dalam:', Math.floor(refreshCountdown / 60), 'menit');
-        }, 1000);
     </script>
 </body>
 </html>
