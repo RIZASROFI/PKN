@@ -63,6 +63,114 @@ def get_weather_data():
         return {'error': f'Error: {str(e)}'}
 
 
+def get_forecast_data():
+    """
+    Ambil forecast cuaca 5 hari dari OpenWeatherMap API
+    
+    Returns:
+        dict: Data forecast atau error message
+    """
+    try:
+        # Endpoint API forecast (5 hari dengan interval 3 jam)
+        url = (
+            f"https://api.openweathermap.org/data/2.5/forecast?"
+            f"lat={LOCATION['latitude']}&"
+            f"lon={LOCATION['longitude']}&"
+            f"appid={OPENWEATHER_API_KEY}&"
+            f"units=metric&"
+            f"lang=id"
+        )
+        
+        response = requests.get(url, timeout=5)
+        response.raise_for_status()
+        
+        return response.json()
+    
+    except requests.exceptions.Timeout:
+        return {'error': 'Forecast API Timeout'}
+    except requests.exceptions.ConnectionError:
+        return {'error': 'Gagal terhubung ke Forecast API'}
+    except requests.exceptions.HTTPError as e:
+        return {'error': f'Error Forecast API: {e.response.status_code}'}
+    except Exception as e:
+        return {'error': f'Error Forecast: {str(e)}'}
+
+
+def parse_forecast_data(api_data):
+    """
+    Parse forecast data dan ambil 1 data per hari (hari siang ~ 12:00)
+    
+    Args:
+        api_data (dict): Response dari OpenWeatherMap Forecast API
+        
+    Returns:
+        list: List forecast per hari
+    """
+    if 'error' in api_data or 'list' not in api_data:
+        return []
+    
+    try:
+        # Map weather icon ke emoji
+        weather_icon_map = {
+            '01d': '☀️', '01n': '🌙',
+            '02d': '🌤️', '02n': '🌤️',
+            '03d': '☁️', '03n': '☁️',
+            '04d': '🌥️', '04n': '🌥️',
+            '09d': '🌧️', '09n': '🌧️',
+            '10d': '🌦️', '10n': '🌦️',
+            '11d': '⛈️', '11n': '⛈️',
+            '13d': '❄️', '13n': '❄️',
+            '50d': '🌫️', '50n': '🌫️',
+        }
+        
+        # Group data by hari
+        daily_forecasts = {}
+        
+        for item in api_data.get('list', []):
+            # Ambil waktu
+            timestamp = item.get('dt', 0)
+            dt_obj = datetime.fromtimestamp(timestamp)
+            date_str = dt_obj.strftime('%Y-%m-%d')
+            hour = dt_obj.hour
+            
+            # Jika belum ada data untuk hari ini, atau jika ini data siang (12:00)
+            if date_str not in daily_forecasts or (12 <= hour < 15):
+                main = item.get('main', {})
+                weather = item.get('weather', [{}])[0]
+                wind = item.get('wind', {})
+                
+                weather_code = weather.get('icon', '01d')
+                weather_emoji = weather_icon_map.get(weather_code, '🌡️')
+                
+                daily_forecasts[date_str] = {
+                    'date': dt_obj.strftime('%a, %d %b'),  # Format: Mon, 27 Jan
+                    'day_name': dt_obj.strftime('%A'),  # Format: Monday
+                    'date_full': dt_obj.strftime('%d %B %Y'),
+                    'timestamp': timestamp,
+                    'temperature': round(main.get('temp', 0)),
+                    'temperature_min': round(main.get('temp_min', 0)),
+                    'temperature_max': round(main.get('temp_max', 0)),
+                    'feels_like': round(main.get('feels_like', 0)),
+                    'humidity': main.get('humidity', 0),
+                    'pressure': main.get('pressure', 0),
+                    'condition': weather.get('main', 'Unknown'),
+                    'description': weather.get('description', '').capitalize(),
+                    'wind_speed': round(wind.get('speed', 0), 1),
+                    'wind_degree': wind.get('deg', 0),
+                    'cloudiness': item.get('clouds', {}).get('all', 0),
+                    'rain': item.get('rain', {}).get('3h', 0),
+                    'weather_emoji': weather_emoji,
+                }
+        
+        # Urutkan berdasarkan tanggal dan ambil 7 hari pertama
+        sorted_forecasts = sorted(daily_forecasts.items())[:7]
+        return [forecast for _, forecast in sorted_forecasts]
+    
+    except Exception as e:
+        print(f"Error parsing forecast: {str(e)}")
+        return []
+
+
 def parse_weather_data(api_data):
     """
     Parse data dari API ke format yang user-friendly
@@ -149,7 +257,7 @@ def parse_weather_data(api_data):
 def index(request):
     """
     View halaman utama E-Cuaca
-    Mengambil data cuaca real-time dan menampilkannya
+    Mengambil data cuaca real-time dan forecast
     """
     # Ambil data dari API
     api_data = get_weather_data()
@@ -157,9 +265,14 @@ def index(request):
     # Parse data ke format yang dimengerti template
     weather_data = parse_weather_data(api_data)
     
+    # Ambil forecast data
+    forecast_api_data = get_forecast_data()
+    forecast_data = parse_forecast_data(forecast_api_data)
+    
     # Context untuk template
     context = {
         'weather': weather_data,
+        'forecast': forecast_data,
         'api_status': 'connected' if not weather_data.get('error') else 'error',
     }
     

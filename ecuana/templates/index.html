@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Cuaca | Monitoring Cuaca Desa Sumberejo</title>
     {% load static %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -297,6 +299,56 @@
                     </div>
                 </div>
 
+                <!-- Forecast 7 Hari -->
+                <div class="forecast-section">
+                    <h2 class="forecast-title">
+                        <i class="fas fa-calendar-days"></i> Prakiraan Cuaca 7 Hari
+                    </h2>
+                    <div class="forecast-grid">
+                        {% for day in forecast %}
+                            <div class="card forecast-card">
+                                <div class="forecast-header">
+                                    <div class="forecast-day">{{ day.day_name }}</div>
+                                    <div class="forecast-date">{{ day.date }}</div>
+                                </div>
+                                
+                                <div class="forecast-emoji">{{ day.weather_emoji }}</div>
+                                
+                                <div class="forecast-content">
+                                    <p class="forecast-condition">{{ day.condition }}</p>
+                                    <p class="forecast-description">{{ day.description }}</p>
+                                    
+                                    <div class="forecast-temps">
+                                        <div class="temp-item temp-max">
+                                            <i class="fas fa-thermometer-full"></i>
+                                            <span>{{ day.temperature_max }}°C</span>
+                                        </div>
+                                        <div class="temp-item temp-min">
+                                            <i class="fas fa-thermometer-empty"></i>
+                                            <span>{{ day.temperature_min }}°C</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="forecast-details">
+                                        <div class="forecast-detail-item">
+                                            <i class="fas fa-tint"></i>
+                                            <span title="Kelembaban">{{ day.humidity }}%</span>
+                                        </div>
+                                        <div class="forecast-detail-item">
+                                            <i class="fas fa-wind"></i>
+                                            <span title="Kecepatan Angin">{{ day.wind_speed }} m/s</span>
+                                        </div>
+                                        <div class="forecast-detail-item">
+                                            <i class="fas fa-cloud"></i>
+                                            <span title="Tutupan Awan">{{ day.cloudiness }}%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
                 <!-- Last Update -->
                 <div class="card update-card">
                     <div class="update-content">
@@ -409,6 +461,24 @@
                 card.style.animationDelay = `${index * 0.1}s`;
                 card.classList.add('animate-in');
             });
+            
+            // Animate stat card icons on hover
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach(card => {
+                const icon = card.querySelector('.stat-icon i');
+                
+                card.addEventListener('mouseenter', function() {
+                    if (icon) {
+                        icon.style.filter = 'brightness(1.3) drop-shadow(0 0 20px currentColor)';
+                    }
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    if (icon) {
+                        icon.style.filter = 'brightness(1)';
+                    }
+                });
+            });
         });
         
         // Auto-refresh timeout
@@ -416,5 +486,7 @@
             location.reload();
         }, AUTO_REFRESH_INTERVAL);
     </script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
