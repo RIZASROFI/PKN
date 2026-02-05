@@ -38,6 +38,14 @@
                         <i class="fas fa-sync-alt"></i>
                         <span>Refresh dalam: <span id="countdown">10:00</span></span>
                     </div>
+                    <nav class="nav-links" style="display: flex; gap: 15px; margin-left: 20px;">
+                        <button type="button" id="recNavBtn" style="color: white; text-decoration: none; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 5px; font-weight: 500; border: none; cursor: pointer;">
+                            💡 Rekomendasi
+                        </button>
+                        <button type="button" id="aboutNavBtn" style="color: white; text-decoration: none; padding: 8px 15px; background: rgba(255,255,255,0.2); border-radius: 5px; font-weight: 500; border: none; cursor: pointer;">
+                            ℹ️ Tentang
+                        </button>
+                    </nav>
                 </div>
             </div>
         </header>
@@ -50,17 +58,99 @@
                     <h2><i class="fas fa-map-marker-alt"></i> Lokasi Monitoring</h2>
                 </div>
                 <div class="location-content">
-                    <div class="location-icon">
-                        <i class="fas fa-location-dot"></i>
-                    </div>
                     <div class="location-details">
                         <p class="location-name">
-                            <i class="fas fa-map-marker-alt"></i> 
                             Desa Sumberejo, Kecamatan Pagelaran, Kabupaten Pringsewu, Provinsi Lampung
                         </p>
                     </div>
                 </div>
             </div>
+
+            <!-- Weather Warning Banner - Mode Darurat Cuaca -->
+            {% if weather_warning.has_warning %}
+                <div class="card warning-card warning-{{ weather_warning.warning_class }}">
+                    <div class="warning-header">
+                        <div class="warning-icon">
+                            <span class="warning-emoji">{{ weather_warning.warning_icon }}</span>
+                        </div>
+                        <div class="warning-content">
+                            <h3 class="warning-title">
+                                {% if weather_warning.warning_type == 'thunderstorm' %}
+                                    PERINGATAN BADAI
+                                {% elif weather_warning.warning_type == 'heavy_rain' %}
+                                    PERINGATAN HUJAN LEBAT
+                                {% elif weather_warning.warning_type == 'strong_wind' %}
+                                    PERINGATAN ANGIN KENCANG
+                                {% endif %}
+                            </h3>
+                            <p class="warning-message">{{ weather_warning.warning_message }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Activity Recommendation Card - Enhanced Version -->
+            {% if activity_recommendation.activity %}
+                <div class="card recommendation-card {% if 'LARANGAN' in activity_recommendation.activity or 'BATASI' in activity_recommendation.activity %}recommendation-warning{% endif %}">
+                    <div class="recommendation-header">
+                        <div class="recommendation-icon">
+                            <span class="rec-emoji">{{ activity_recommendation.icon }}</span>
+                        </div>
+                        <div class="recommendation-title-section">
+                            <h3 class="recommendation-title">💡 Rekomendasi Aktivitas</h3>
+                            <p class="recommendation-subtitle">{{ activity_recommendation.activity }}</p>
+                        </div>
+                    </div>
+                    <div class="recommendation-content">
+                        <p class="recommendation-description">{{ activity_recommendation.description }}</p>
+                        
+                        <!-- Cautions Section - Displayed Prominently -->
+                        {% if activity_recommendation.cautions %}
+                            <div class="recommendation-cautions">
+                                <h4 class="section-title">⚠️ Peringatan & Peringatan Penting:</h4>
+                                <ul class="caution-list">
+                                    {% for caution in activity_recommendation.cautions %}
+                                        <li class="caution-item">{{ caution }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Tips Section -->
+                        {% if activity_recommendation.tips %}
+                            <div class="recommendation-tips">
+                                <h4 class="section-title">✅ Tips & Panduan:</h4>
+                                <ul class="tips-list">
+                                    {% for tip in activity_recommendation.tips %}
+                                        <li class="tip-item">{{ tip }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Recommendations Section -->
+                        {% if activity_recommendation.recommendations %}
+                            <div class="recommendation-activities">
+                                <h4 class="section-title">🎯 Aktivitas yang Disarankan:</h4>
+                                <ul class="activity-list">
+                                    {% for rec in activity_recommendation.recommendations %}
+                                        <li class="activity-item">{{ rec }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Best Time Section -->
+                        {% if activity_recommendation.best_time %}
+                            <div class="recommendation-timing">
+                                <p class="timing-text">
+                                    <strong>⏰ Waktu Terbaik:</strong> {{ activity_recommendation.best_time }}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
 
             {% if weather.error %}
                 <!-- Error State -->
@@ -132,6 +222,64 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Weekly Statistics -->
+                {% if weekly_stats.total_forecast_days > 0 %}
+                    <div class="card weekly-stats-card">
+                        <div class="stats-header">
+                            <h2><i class="fas fa-chart-line"></i> Statistik Mingguan</h2>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-item-icon">🔥</div>
+                                <div class="stat-item-content">
+                                    <h4>Hari Terpanas</h4>
+                                    {% if weekly_stats.hottest_day %}
+                                        <p class="stat-item-value">{{ weekly_stats.hottest_day.day_name }}</p>
+                                        <p class="stat-item-detail">{{ weekly_stats.hottest_day.temperature }}°C</p>
+                                    {% else %}
+                                        <p class="stat-item-value">-</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="stat-item">
+                                <div class="stat-item-icon">❄️</div>
+                                <div class="stat-item-content">
+                                    <h4>Hari Terdingin</h4>
+                                    {% if weekly_stats.coldest_day %}
+                                        <p class="stat-item-value">{{ weekly_stats.coldest_day.day_name }}</p>
+                                        <p class="stat-item-detail">{{ weekly_stats.coldest_day.temperature }}°C</p>
+                                    {% else %}
+                                        <p class="stat-item-value">-</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="stat-item">
+                                <div class="stat-item-icon">🌡️</div>
+                                <div class="stat-item-content">
+                                    <h4>Rata-rata Suhu</h4>
+                                    <p class="stat-item-value">{{ weekly_stats.average_temperature }}°C</p>
+                                    <p class="stat-item-detail">Selama 7 hari</p>
+                                </div>
+                            </div>
+
+                            <div class="stat-item">
+                                <div class="stat-item-icon">🌧️</div>
+                                <div class="stat-item-content">
+                                    <h4>Hari Paling Hujan</h4>
+                                    {% if weekly_stats.rainiest_day %}
+                                        <p class="stat-item-value">{{ weekly_stats.rainiest_day.day_name }}</p>
+                                        <p class="stat-item-detail">{{ weekly_stats.rainiest_day.rain }}mm</p>
+                                    {% else %}
+                                        <p class="stat-item-value">Tidak ada hujan</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
 
                 <!-- Weather Details Grid -->
                 <div class="weather-grid">
@@ -308,7 +456,7 @@
             </div>
             <div class="title-text">
                 <h2>Prakiraan Cuaca 7 Hari</h2>
-                <p class="section-subtitle">Ramalan cuaca untuk seminggu ke depan di Desa Sumberejo</p>
+                <p class="section-subtitle">Ramalan cuaca untuk 7 hari ke depan di Desa Sumberejo</p>
             </div>
         </div>
         <div class="header-controls">
@@ -445,14 +593,346 @@
                                 <p class="update-refresh">Data diperbarui setiap kali halaman dimuat</p>
                             </div>
                         </div>
-                        <button class="refresh-btn" id="manualRefresh">
-                            <i class="fas fa-sync-alt"></i>
-                            Refresh Sekarang
-                        </button>
+                        <div class="update-actions">
+                            <button class="action-btn action-info" id="aboutSystemBtn">
+                                <i class="fas fa-info-circle"></i>
+                                Tentang Sistem
+                            </button>
+                            <button class="action-btn action-refresh" id="manualRefresh">
+                                <i class="fas fa-sync-alt"></i>
+                                Refresh Sekarang
+                            </button>
+                        </div>
                     </div>
                 </div>
             {% endif %}
         </main>
+
+        <!-- Modal Tentang Sistem -->
+        <div class="modal fade" id="aboutSystemModal" tabindex="-1" aria-labelledby="aboutSystemLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content about-modal">
+                    <div class="modal-header about-modal-header">
+                        <div class="about-modal-title">
+                            <i class="fas fa-info-circle"></i>
+                            <h2 id="aboutSystemLabel">Tentang Sistem E-Cuaca</h2>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body about-modal-body">
+                        <div class="about-section">
+                            <h3><i class="fas fa-target"></i> Tujuan Sistem</h3>
+                            <p>
+                                E-Cuaca adalah sistem monitoring cuaca real-time yang dirancang untuk menyediakan informasi cuaca 
+                                akurat dan terpercaya bagi warga Desa Sumberejo. Sistem ini membantu warga mengambil keputusan 
+                                aktivitas harian berdasarkan kondisi cuaca terkini.
+                            </p>
+                        </div>
+
+                        <div class="about-section">
+                            <h3><i class="fas fa-lightbulb"></i> Manfaat bagi Warga</h3>
+                            <ul class="about-list">
+                                <li>
+                                    <i class="fas fa-shield-alt"></i>
+                                    <span><strong>Meningkatkan Kewaspadaan</strong> - Peringatan otomatis saat cuaca ekstrem terjadi</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-leaf"></i>
+                                    <span><strong>Membantu Pertanian</strong> - Rekomendasi aktivitas bertani berdasarkan kondisi cuaca</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-smartphone"></i>
+                                    <span><strong>Akses Mudah</strong> - Informasi cuaca yang cepat dan mudah dipahami</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-clock"></i>
+                                    <span><strong>Update Real-Time</strong> - Data cuaca selalu terbaru setiap saat</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="about-section">
+                            <h3><i class="fas fa-database"></i> Sumber Data</h3>
+                            <p>
+                                Data cuaca diperoleh dari <strong>OpenWeatherMap API</strong>, layanan penyedia informasi cuaca terpercaya 
+                                yang mencakup lebih dari 200 negara. Data diperbarui otomatis setiap kali halaman dimuat.
+                            </p>
+                        </div>
+
+                        <div class="about-section">
+                            <h3><i class="fas fa-graduation-cap"></i> Informasi Proyek</h3>
+                            <div class="about-info-grid">
+                                <div class="info-item">
+                                    <label>Jenis Proyek:</label>
+                                    <p>Praktik Kerja Nyata (PKN) 36</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Institusi:</label>
+                                    <p>Politeknik Negeri Lampung</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Lokasi:</label>
+                                    <p>Desa Sumberejo, Pringsewu, Lampung</p>
+                                </div>
+                                <div class="info-item">
+                                    <label>Tahun:</label>
+                                    <p>2026</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="about-section">
+                            <h3><i class="fas fa-cog"></i> Fitur Utama</h3>
+                            <div class="features-grid">
+                                <div class="feature-item">
+                                    <span class="feature-icon">⚠️</span>
+                                    <span class="feature-name">Peringatan Cuaca</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">💡</span>
+                                    <span class="feature-name">Rekomendasi Aktivitas</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">📊</span>
+                                    <span class="feature-name">Statistik Mingguan</span>
+                                </div>
+                                <div class="feature-item">
+                                    <span class="feature-icon">🌤️</span>
+                                    <span class="feature-name">Prakiraan 7 Hari</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer about-modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Rekomendasi Aktivitas -->
+        <div class="modal fade" id="recommendationModal" tabindex="-1" aria-labelledby="recommendationLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+                <div class="modal-content recommendation-modal">
+                    <div class="modal-header recommendation-modal-header">
+                        <div class="recommendation-modal-title">
+                            <span class="rec-emoji-large">{{ activity_recommendation.icon|default:"💡" }}</span>
+                            <div>
+                                <h2 id="recommendationLabel">Rekomendasi Aktivitas Harian</h2>
+                                <p class="rec-subtitle">Cuaca Real-Time: {{ weather.description }}</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body recommendation-modal-body">
+                        {% if not weather.error %}
+                            <!-- Weather Current Info -->
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 0.9rem;">
+                                    <div>
+                                        <strong>🌡️ Suhu:</strong> {{ weather.temperature }}°C ({{ weather.feels_like }}°C)
+                                    </div>
+                                    <div>
+                                        <strong>💨 Angin:</strong> {{ weather.wind_speed }} m/s
+                                    </div>
+                                    <div>
+                                        <strong>💧 Kelembapan:</strong> {{ weather.humidity }}%
+                                    </div>
+                                    <div>
+                                        <strong>⏰ Update:</strong> {{ weather.update_time }}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Tab Navigation for Categories -->
+                            <ul class="nav nav-tabs" role="tablist" style="margin-bottom: 15px;">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="agri-tab" data-bs-toggle="tab" data-bs-target="#agri-content" type="button" role="tab">👨‍🌾 Pertanian</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="sports-tab" data-bs-toggle="tab" data-bs-target="#sports-content" type="button" role="tab">🏃 Olahraga</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="household-tab" data-bs-toggle="tab" data-bs-target="#household-content" type="button" role="tab">🏠 Rumah</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="construction-tab" data-bs-toggle="tab" data-bs-target="#construction-content" type="button" role="tab">🔨 Konstruksi</button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="animal-tab" data-bs-toggle="tab" data-bs-target="#animal-content" type="button" role="tab">🐔 Peternakan</button>
+                                </li>
+                            </ul>
+
+                            <!-- Tab Content -->
+                            <div class="tab-content">
+                                <!-- Pertanian -->
+                                <div class="tab-pane fade show active" id="agri-content" role="tabpanel">
+                                    <div class="recommendation-category">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                            <h4>{{ detailed_recommendations.agriculture.title }}</h4>
+                                            <span class="badge bg-{% if detailed_recommendations.agriculture.priority == 'success' %}success{% elif detailed_recommendations.agriculture.priority == 'danger' %}danger{% elif detailed_recommendations.agriculture.priority == 'warning' %}warning{% else %}secondary{% endif %}">
+                                                {% if detailed_recommendations.agriculture.priority == 'danger' %}🚫 DILARANG{% elif detailed_recommendations.agriculture.priority == 'warning' %}⚠️ DIBATASI{% elif detailed_recommendations.agriculture.priority == 'success' %}✅ OPTIMAL{% else %}ℹ️ NORMAL{% endif %}
+                                            </span>
+                                        </div>
+                                        {% if detailed_recommendations.agriculture.activities %}
+                                            <strong style="display: block; margin-top: 10px;">Aktivitas Disarankan:</strong>
+                                            <ul style="margin: 8px 0;">
+                                                {% for activity in detailed_recommendations.agriculture.activities %}
+                                                    <li>{{ activity }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.agriculture.cautions %}
+                                            <strong style="display: block; margin-top: 10px; color: #dc3545;">Peringatan:</strong>
+                                            <ul style="margin: 8px 0; color: #dc3545;">
+                                                {% for caution in detailed_recommendations.agriculture.cautions %}
+                                                    <li>{{ caution }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.agriculture.best_timing %}
+                                            <p style="margin-top: 10px; font-style: italic;"><strong>⏰ Waktu Terbaik:</strong> {{ detailed_recommendations.agriculture.best_timing }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Olahraga -->
+                                <div class="tab-pane fade" id="sports-content" role="tabpanel">
+                                    <div class="recommendation-category">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                            <h4>{{ detailed_recommendations.sports.title }}</h4>
+                                            <span class="badge bg-{% if detailed_recommendations.sports.priority == 'success' %}success{% elif detailed_recommendations.sports.priority == 'danger' %}danger{% elif detailed_recommendations.sports.priority == 'warning' %}warning{% else %}secondary{% endif %}">
+                                                {% if detailed_recommendations.sports.priority == 'danger' %}🚫 DILARANG{% elif detailed_recommendations.sports.priority == 'warning' %}⚠️ DIBATASI{% elif detailed_recommendations.sports.priority == 'success' %}✅ OPTIMAL{% else %}ℹ️ NORMAL{% endif %}
+                                            </span>
+                                        </div>
+                                        {% if detailed_recommendations.sports.activities %}
+                                            <strong style="display: block; margin-top: 10px;">Aktivitas Disarankan:</strong>
+                                            <ul style="margin: 8px 0;">
+                                                {% for activity in detailed_recommendations.sports.activities %}
+                                                    <li>{{ activity }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.sports.cautions %}
+                                            <strong style="display: block; margin-top: 10px; color: #dc3545;">Peringatan:</strong>
+                                            <ul style="margin: 8px 0; color: #dc3545;">
+                                                {% for caution in detailed_recommendations.sports.cautions %}
+                                                    <li>{{ caution }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.sports.best_timing %}
+                                            <p style="margin-top: 10px; font-style: italic;"><strong>⏰ Waktu Terbaik:</strong> {{ detailed_recommendations.sports.best_timing }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Pekerjaan Rumah -->
+                                <div class="tab-pane fade" id="household-content" role="tabpanel">
+                                    <div class="recommendation-category">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                            <h4>{{ detailed_recommendations.household.title }}</h4>
+                                            <span class="badge bg-{% if detailed_recommendations.household.priority == 'success' %}success{% elif detailed_recommendations.household.priority == 'danger' %}danger{% elif detailed_recommendations.household.priority == 'warning' %}warning{% else %}secondary{% endif %}">
+                                                {% if detailed_recommendations.household.priority == 'danger' %}🚫 DILARANG{% elif detailed_recommendations.household.priority == 'warning' %}⚠️ DIBATASI{% elif detailed_recommendations.household.priority == 'success' %}✅ OPTIMAL{% else %}ℹ️ NORMAL{% endif %}
+                                            </span>
+                                        </div>
+                                        {% if detailed_recommendations.household.activities %}
+                                            <strong style="display: block; margin-top: 10px;">Aktivitas Disarankan:</strong>
+                                            <ul style="margin: 8px 0;">
+                                                {% for activity in detailed_recommendations.household.activities %}
+                                                    <li>{{ activity }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.household.cautions %}
+                                            <strong style="display: block; margin-top: 10px; color: #dc3545;">Peringatan:</strong>
+                                            <ul style="margin: 8px 0; color: #dc3545;">
+                                                {% for caution in detailed_recommendations.household.cautions %}
+                                                    <li>{{ caution }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.household.best_timing %}
+                                            <p style="margin-top: 10px; font-style: italic;"><strong>⏰ Waktu Terbaik:</strong> {{ detailed_recommendations.household.best_timing }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Perbaikan & Konstruksi -->
+                                <div class="tab-pane fade" id="construction-content" role="tabpanel">
+                                    <div class="recommendation-category">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                            <h4>{{ detailed_recommendations.construction.title }}</h4>
+                                            <span class="badge bg-{% if detailed_recommendations.construction.priority == 'success' %}success{% elif detailed_recommendations.construction.priority == 'danger' %}danger{% elif detailed_recommendations.construction.priority == 'warning' %}warning{% else %}secondary{% endif %}">
+                                                {% if detailed_recommendations.construction.priority == 'danger' %}🚫 DILARANG{% elif detailed_recommendations.construction.priority == 'warning' %}⚠️ DIBATASI{% elif detailed_recommendations.construction.priority == 'success' %}✅ OPTIMAL{% else %}ℹ️ NORMAL{% endif %}
+                                            </span>
+                                        </div>
+                                        {% if detailed_recommendations.construction.activities %}
+                                            <strong style="display: block; margin-top: 10px;">Aktivitas Disarankan:</strong>
+                                            <ul style="margin: 8px 0;">
+                                                {% for activity in detailed_recommendations.construction.activities %}
+                                                    <li>{{ activity }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.construction.cautions %}
+                                            <strong style="display: block; margin-top: 10px; color: #dc3545;">Peringatan:</strong>
+                                            <ul style="margin: 8px 0; color: #dc3545;">
+                                                {% for caution in detailed_recommendations.construction.cautions %}
+                                                    <li>{{ caution }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.construction.best_timing %}
+                                            <p style="margin-top: 10px; font-style: italic;"><strong>⏰ Waktu Terbaik:</strong> {{ detailed_recommendations.construction.best_timing }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Peternakan -->
+                                <div class="tab-pane fade" id="animal-content" role="tabpanel">
+                                    <div class="recommendation-category">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                            <h4>{{ detailed_recommendations.animal_care.title }}</h4>
+                                            <span class="badge bg-{% if detailed_recommendations.animal_care.priority == 'success' %}success{% elif detailed_recommendations.animal_care.priority == 'danger' %}danger{% elif detailed_recommendations.animal_care.priority == 'warning' %}warning{% else %}secondary{% endif %}">
+                                                {% if detailed_recommendations.animal_care.priority == 'danger' %}🚫 DILARANG{% elif detailed_recommendations.animal_care.priority == 'warning' %}⚠️ DIBATASI{% elif detailed_recommendations.animal_care.priority == 'success' %}✅ OPTIMAL{% else %}ℹ️ NORMAL{% endif %}
+                                            </span>
+                                        </div>
+                                        {% if detailed_recommendations.animal_care.activities %}
+                                            <strong style="display: block; margin-top: 10px;">Aktivitas Disarankan:</strong>
+                                            <ul style="margin: 8px 0;">
+                                                {% for activity in detailed_recommendations.animal_care.activities %}
+                                                    <li>{{ activity }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.animal_care.cautions %}
+                                            <strong style="display: block; margin-top: 10px; color: #dc3545;">Peringatan:</strong>
+                                            <ul style="margin: 8px 0; color: #dc3545;">
+                                                {% for caution in detailed_recommendations.animal_care.cautions %}
+                                                    <li>{{ caution }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                        {% if detailed_recommendations.animal_care.best_timing %}
+                                            <p style="margin-top: 10px; font-style: italic;"><strong>⏰ Waktu Terbaik:</strong> {{ detailed_recommendations.animal_care.best_timing }}</p>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="no-recommendation">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <p>{{ weather.error }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="modal-footer recommendation-modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Mengerti</button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- Footer -->
         <footer class="footer">
@@ -482,6 +962,11 @@
                 <div class="footer-year">
                     <p>© 2026 E-Cuaca</p>
                     <p class="footer-version">v2.1.0</p>
+                    <p style="margin-top: 10px;">
+                        <button type="button" id="footerAboutBtn" style="color: var(--accent); text-decoration: none; font-weight: 600; background: none; border: none; cursor: pointer;">
+                            <i class="fas fa-info-circle"></i> Tentang Sistem
+                        </button>
+                    </p>
                 </div>
             </div>
         </footer>
@@ -646,6 +1131,42 @@
                     }
                 });
             });
+
+            // ========== Modal Tentang Sistem ==========
+            const aboutSystemBtn = document.getElementById('aboutSystemBtn');
+            if (aboutSystemBtn) {
+                aboutSystemBtn.addEventListener('click', function() {
+                    const aboutModal = new bootstrap.Modal(document.getElementById('aboutSystemModal'));
+                    aboutModal.show();
+                });
+            }
+
+            // ========== Tombol Tentang di Navbar ==========
+            const aboutNavBtn = document.getElementById('aboutNavBtn');
+            if (aboutNavBtn) {
+                aboutNavBtn.addEventListener('click', function() {
+                    const aboutModal = new bootstrap.Modal(document.getElementById('aboutSystemModal'));
+                    aboutModal.show();
+                });
+            }
+
+            // ========== Tombol Tentang di Footer ==========
+            const footerAboutBtn = document.getElementById('footerAboutBtn');
+            if (footerAboutBtn) {
+                footerAboutBtn.addEventListener('click', function() {
+                    const aboutModal = new bootstrap.Modal(document.getElementById('aboutSystemModal'));
+                    aboutModal.show();
+                });
+            }
+
+            // ========== Tombol Rekomendasi di Navbar ==========
+            const recNavBtn = document.getElementById('recNavBtn');
+            if (recNavBtn) {
+                recNavBtn.addEventListener('click', function() {
+                    const recModal = new bootstrap.Modal(document.getElementById('recommendationModal'));
+                    recModal.show();
+                });
+            }
         });
         
         // Auto-refresh timeout

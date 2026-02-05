@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rekomendasi Aktivitas | E-Cuaca</title>
+    {% load static %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🌤️</text></svg>">
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="background-animation">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="sun"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-container">
+                    <div class="logo-icon">🌤️</div>
+                    <div class="logo-text">
+                        <h1 class="title">E-Cuaca</h1>
+                        <p class="subtitle">Rekomendasi Aktivitas Berdasarkan Cuaca</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <a href="{% url 'cuaca:index' %}" class="nav-link">
+                        <i class="fas fa-home"></i> Beranda
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Current Weather Summary -->
+            <div class="card weather-summary-card">
+                <div class="summary-header">
+                    <div>
+                        <h2><i class="fas fa-cloud-sun"></i> Ringkasan Cuaca Saat Ini (Real-Time)</h2>
+                        {% if not weather.error %}
+                            <p class="update-time" style="margin: 5px 0 0 0; font-size: 0.9rem; color: #666;">
+                                📍 {{ weather.location_name }} | ⏰ Terakhir diperbarui: {{ weather.update_time }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if not weather.error %}
+                    <div class="summary-content">
+                        <div class="weather-current">
+                            <div class="weather-emoji-large">{{ weather.weather_emoji }}</div>
+                            <div class="weather-details">
+                                <h3 class="temp-large">{{ weather.temperature }}°C</h3>
+                                <p class="condition-text">{{ weather.description }}</p>
+                                <p class="feels-like">Terasa seperti {{ weather.feels_like }}°C</p>
+                                <div class="weather-info-grid">
+                                    <div class="info-item">
+                                        <span class="info-label">Kelembapan</span>
+                                        <span class="info-value">{{ weather.humidity }}%</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Angin</span>
+                                        <span class="info-value">{{ weather.wind_speed }} m/s</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Tekanan</span>
+                                        <span class="info-value">{{ weather.pressure }} hPa</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Visibilitas</span>
+                                        <span class="info-value">{{ weather.visibility|floatformat:1 }} km</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Awan</span>
+                                        <span class="info-value">{{ weather.cloudiness }}%</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-label">Suhu Min/Max</span>
+                                        <span class="info-value">{{ weather.temperature_min }}° / {{ weather.temperature_max }}°</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        {{ weather.error }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Weather Warning Banner -->
+            {% if has_warning %}
+                <div class="card warning-card warning-{{ weather_warning.warning_class }}">
+                    <div class="warning-header">
+                        <div class="warning-icon">
+                            <span class="warning-emoji">{{ weather_warning.warning_icon }}</span>
+                        </div>
+                        <div class="warning-content">
+                            <h3 class="warning-title">⚠️ PERINGATAN CUACA</h3>
+                            <p class="warning-message">{{ weather_warning.warning_message }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Weather Analysis Card -->
+            {% if not weather.error %}
+            <div class="card weather-analysis-card">
+                <div style="padding: 20px;">
+                    <h3 style="margin-top: 0; margin-bottom: 10px;">📊 Analisis Cuaca Hari Ini</h3>
+                    <div class="weather-analysis-grid">
+                        <div class="weather-analysis-item">
+                            <strong>Kondisi Utama:</strong>
+                            {{ weather.condition }} - {{ weather.description }}
+                        </div>
+                        <div class="weather-analysis-item">
+                            <strong>Indeks Ketinggian Angin:</strong>
+                            {% if weather.wind_speed >= 10 %}
+                                🌬️ KENCANG ({{ weather.wind_speed }} m/s)
+                            {% elif weather.wind_speed >= 5 %}
+                                💨 SEDANG ({{ weather.wind_speed }} m/s)
+                            {% else %}
+                                🌊 RENDAH ({{ weather.wind_speed }} m/s)
+                            {% endif %}
+                        </div>
+                        <div class="weather-analysis-item">
+                            <strong>Level Kelembapan:</strong>
+                            {% if weather.humidity >= 85 %}
+                                💧 SANGAT TINGGI ({{ weather.humidity }}%)
+                            {% elif weather.humidity >= 70 %}
+                                💧 TINGGI ({{ weather.humidity }}%)
+                            {% elif weather.humidity >= 50 %}
+                                💧 NORMAL ({{ weather.humidity }}%)
+                            {% else %}
+                                🏜️ RENDAH ({{ weather.humidity }}%)
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Recommendations by Category -->
+            <div class="recommendations-grid">
+                <!-- PERTANIAN -->
+                <div class="recommendation-category-card priority-{{ recommendations.agriculture.priority }}">
+                    <div class="category-header">
+                        <h3>{{ recommendations.agriculture.title }}</h3>
+                        <span class="priority-badge priority-{{ recommendations.agriculture.priority }}">
+                            {% if recommendations.agriculture.priority == 'danger' %}
+                                🚫 DILARANG
+                            {% elif recommendations.agriculture.priority == 'warning' %}
+                                ⚠️ DIBATASI
+                            {% elif recommendations.agriculture.priority == 'success' %}
+                                ✅ OPTIMAL
+                            {% else %}
+                                ℹ️ NORMAL
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="category-content">
+                        <!-- Activities List -->
+                        {% if recommendations.agriculture.activities %}
+                            <div class="activity-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-list-check"></i> Aktivitas yang Disarankan
+                                </h4>
+                                <ul class="activity-list">
+                                    {% for activity in recommendations.agriculture.activities %}
+                                        <li class="activity-item">{{ activity }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <!-- Cautions -->
+                        {% if recommendations.agriculture.cautions %}
+                            <div class="caution-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-exclamation"></i> Peringatan & Perhatian
+                                </h4>
+                                <ul class="caution-list">
+                                    {% for caution in recommendations.agriculture.cautions %}
+                                        <li class="caution-item">{{ caution }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        <!-- Best Timing -->
+                        {% if recommendations.agriculture.best_timing %}
+                            <div class="timing-section">
+                                <p class="timing-text">
+                                    <strong><i class="fas fa-clock"></i> Waktu Terbaik:</strong><br>
+                                    {{ recommendations.agriculture.best_timing }}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- OLAHRAGA -->
+                <div class="recommendation-category-card priority-{{ recommendations.sports.priority }}">
+                    <div class="category-header">
+                        <h3>{{ recommendations.sports.title }}</h3>
+                        <span class="priority-badge priority-{{ recommendations.sports.priority }}">
+                            {% if recommendations.sports.priority == 'danger' %}
+                                🚫 DILARANG
+                            {% elif recommendations.sports.priority == 'warning' %}
+                                ⚠️ DIBATASI
+                            {% elif recommendations.sports.priority == 'success' %}
+                                ✅ OPTIMAL
+                            {% else %}
+                                ℹ️ NORMAL
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="category-content">
+                        {% if recommendations.sports.activities %}
+                            <div class="activity-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-list-check"></i> Aktivitas yang Disarankan
+                                </h4>
+                                <ul class="activity-list">
+                                    {% for activity in recommendations.sports.activities %}
+                                        <li class="activity-item">{{ activity }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if recommendations.sports.cautions %}
+                            <div class="caution-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-exclamation"></i> Peringatan & Perhatian
+                                </h4>
+                                <ul class="caution-list">
+                                    {% for caution in recommendations.sports.cautions %}
+                                        <li class="caution-item">{{ caution }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if recommendations.sports.best_timing %}
+                            <div class="timing-section">
+                                <p class="timing-text">
+                                    <strong><i class="fas fa-clock"></i> Waktu Terbaik:</strong><br>
+                                    {{ recommendations.sports.best_timing }}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- PEKERJAAN RUMAH -->
+                <div class="recommendation-category-card priority-{{ recommendations.household.priority }}">
+                    <div class="category-header">
+                        <h3>{{ recommendations.household.title }}</h3>
+                        <span class="priority-badge priority-{{ recommendations.household.priority }}">
+                            {% if recommendations.household.priority == 'danger' %}
+                                🚫 DILARANG
+                            {% elif recommendations.household.priority == 'warning' %}
+                                ⚠️ DIBATASI
+                            {% elif recommendations.household.priority == 'success' %}
+                                ✅ OPTIMAL
+                            {% else %}
+                                ℹ️ NORMAL
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="category-content">
+                        {% if recommendations.household.activities %}
+                            <div class="activity-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-list-check"></i> Aktivitas yang Disarankan
+                                </h4>
+                                <ul class="activity-list">
+                                    {% for activity in recommendations.household.activities %}
+                                        <li class="activity-item">{{ activity }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if recommendations.household.cautions %}
+                            <div class="caution-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-exclamation"></i> Peringatan & Perhatian
+                                </h4>
+                                <ul class="caution-list">
+                                    {% for caution in recommendations.household.cautions %}
+                                        <li class="caution-item">{{ caution }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if recommendations.household.best_timing %}
+                            <div class="timing-section">
+                                <p class="timing-text">
+                                    <strong><i class="fas fa-clock"></i> Waktu Terbaik:</strong><br>
+                                    {{ recommendations.household.best_timing }}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- PERBAIKAN & KONSTRUKSI -->
+                <div class="recommendation-category-card priority-{{ recommendations.construction.priority }}">
+                    <div class="category-header">
+                        <h3>{{ recommendations.construction.title }}</h3>
+                        <span class="priority-badge priority-{{ recommendations.construction.priority }}">
+                            {% if recommendations.construction.priority == 'danger' %}
+                                🚫 DILARANG
+                            {% elif recommendations.construction.priority == 'warning' %}
+                                ⚠️ DIBATASI
+                            {% elif recommendations.construction.priority == 'success' %}
+                                ✅ OPTIMAL
+                            {% else %}
+                                ℹ️ NORMAL
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="category-content">
+                        {% if recommendations.construction.activities %}
+                            <div class="activity-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-list-check"></i> Aktivitas yang Disarankan
+                                </h4>
+                                <ul class="activity-list">
+                                    {% for activity in recommendations.construction.activities %}
+                                        <li class="activity-item">{{ activity }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if recommendations.construction.cautions %}
+                            <div class="caution-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-exclamation"></i> Peringatan & Perhatian
+                                </h4>
+                                <ul class="caution-list">
+                                    {% for caution in recommendations.construction.cautions %}
+                                        <li class="caution-item">{{ caution }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if recommendations.construction.best_timing %}
+                            <div class="timing-section">
+                                <p class="timing-text">
+                                    <strong><i class="fas fa-clock"></i> Waktu Terbaik:</strong><br>
+                                    {{ recommendations.construction.best_timing }}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- PETERNAKAN & HEWAN TERNAK -->
+                <div class="recommendation-category-card priority-{{ recommendations.animal_care.priority }}">
+                    <div class="category-header">
+                        <h3>{{ recommendations.animal_care.title }}</h3>
+                        <span class="priority-badge priority-{{ recommendations.animal_care.priority }}">
+                            {% if recommendations.animal_care.priority == 'danger' %}
+                                🚫 DILARANG
+                            {% elif recommendations.animal_care.priority == 'warning' %}
+                                ⚠️ DIBATASI
+                            {% elif recommendations.animal_care.priority == 'success' %}
+                                ✅ OPTIMAL
+                            {% else %}
+                                ℹ️ NORMAL
+                            {% endif %}
+                        </span>
+                    </div>
+
+                    <div class="category-content">
+                        {% if recommendations.animal_care.activities %}
+                            <div class="activity-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-list-check"></i> Aktivitas yang Disarankan
+                                </h4>
+                                <ul class="activity-list">
+                                    {% for activity in recommendations.animal_care.activities %}
+                                        <li class="activity-item">{{ activity }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if recommendations.animal_care.cautions %}
+                            <div class="caution-section">
+                                <h4 class="section-title">
+                                    <i class="fas fa-exclamation"></i> Peringatan & Perhatian
+                                </h4>
+                                <ul class="caution-list">
+                                    {% for caution in recommendations.animal_care.cautions %}
+                                        <li class="caution-item">{{ caution }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        {% endif %}
+
+                        {% if recommendations.animal_care.best_timing %}
+                            <div class="timing-section">
+                                <p class="timing-text">
+                                    <strong><i class="fas fa-clock"></i> Waktu Terbaik:</strong><br>
+                                    {{ recommendations.animal_care.best_timing }}
+                                </p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Navigation -->
+            <div class="card navigation-card" style="margin-top: 30px;">
+                <div class="nav-content">
+                    <a href="{% url 'cuaca:index' %}" class="nav-button">
+                        <i class="fas fa-home"></i> Kembali ke Beranda
+                    </a>
+                    <a href="{% url 'cuaca:tentang' %}" class="nav-button">
+                        <i class="fas fa-info-circle"></i> Tentang Sistem
+                    </a>
+                    <button class="nav-button" onclick="location.reload();">
+                        <i class="fas fa-sync-alt"></i> Refresh Data Cuaca
+                    </button>
+                </div>
+            </div>
+
+            <!-- Real-Time Update Info -->
+            <div style="text-align: center; margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; font-size: 0.9rem; color: #666;">
+                <p style="margin: 0;">
+                    💡 <strong>Tips:</strong> Data cuaca diperbarui secara real-time dari OpenWeatherMap API setiap kali Anda membuka halaman ini.<br>
+                    🔄 Klik tombol "Refresh Data Cuaca" untuk memperbarui data cuaca terbaru.<br>
+                    ⏰ Rekomendasi aktivitas disesuaikan dengan kondisi cuaca hari ini.
+                </p>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Auto-refresh script (optional - refresh setiap 5 menit) -->
+    <script>
+        // Uncomment baris di bawah jika ingin auto-refresh setiap 5 menit
+        // setInterval(function() {
+        //     location.reload();
+        // }, 5 * 60 * 1000); // 5 menit
+    </script>
+</body>
+</html>

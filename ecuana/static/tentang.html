@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tentang E-Cuaca | Sistem Monitoring Cuaca Desa Sumberejo</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75'>🌤️</text></svg>">
+
+    <style>
+        .about-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .about-header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 60px 30px;
+            border-radius: var(--radius-xl);
+            margin-bottom: 40px;
+            text-align: center;
+            box-shadow: var(--shadow-card);
+        }
+
+        .about-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .about-header .emoji-large {
+            font-size: 4rem;
+        }
+
+        .about-header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .about-section {
+            background: white;
+            padding: 40px;
+            border-radius: var(--radius-lg);
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-sm);
+            border-left: 5px solid var(--primary-blue);
+        }
+
+        .about-section h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .about-section h2 i {
+            font-size: 2.2rem;
+            color: var(--primary-blue);
+        }
+
+        .about-section p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .benefits-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits-list li {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.08) 0%, rgba(76, 201, 240, 0.08) 100%);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--primary-blue);
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .benefits-list i {
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+            min-width: 30px;
+        }
+
+        .benefits-list-content {
+            flex: 1;
+        }
+
+        .benefits-list-title {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+
+        .benefits-list-desc {
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            padding: 25px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            border-radius: var(--radius-md);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition-normal);
+            border: 1px solid rgba(67, 97, 238, 0.1);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--primary-blue);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .feature-card p {
+            font-size: 0.95rem;
+            color: var(--gray);
+        }
+
+        .team-section {
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.05) 0%, rgba(76, 201, 240, 0.05) 100%);
+        }
+
+        .team-section h2 {
+            border-left-color: var(--accent);
+        }
+
+        .team-section h2 i {
+            color: var(--accent);
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .team-member {
+            padding: 20px;
+            background: white;
+            border-radius: var(--radius-md);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .team-member-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .team-member-name {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .team-member-role {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--accent) 100%);
+            color: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .contact-info h3 {
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .nav-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--primary-blue);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            transition: all var(--transition-fast);
+            margin-bottom: 30px;
+        }
+
+        .nav-back:hover {
+            background: var(--primary-dark);
+            transform: translateX(-5px);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .about-header {
+                padding: 40px 20px;
+            }
+
+            .about-header h1 {
+                font-size: 2rem;
+            }
+
+            .about-header .emoji-large {
+                font-size: 3rem;
+            }
+
+            .about-section {
+                padding: 25px;
+            }
+
+            .about-section h2 {
+                font-size: 1.5rem;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Animation -->
+    <div class="background-animation">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        <div class="cloud cloud-3"></div>
+        <div class="sun"></div>
+    </div>
+
+    <div class="about-container">
+        <!-- Back Button -->
+        <a href="index.html" class="nav-back">
+            <i class="fas fa-arrow-left"></i>
+            Kembali ke Halaman Utama
+        </a>
+
+        <!-- Header -->
+        <div class="about-header">
+            <h1>
+                <span class="emoji-large">🌤️</span>
+                E-Cuaca
+            </h1>
+            <p>Sistem Monitoring Cuaca Real-Time untuk Desa Sumberejo, Kabupaten Pringsewu, Lampung</p>
+        </div>
+
+        <!-- Tujuan E-Cuaca -->
+        <div class="about-section">
+            <h2>
+                <i class="fas fa-target"></i>
+                Tujuan E-Cuaca
+            </h2>
+            <p>
+                E-Cuaca adalah sistem informasi cuaca berbasis web yang dirancang khusus untuk memenuhi kebutuhan 
+                masyarakat Desa Sumberejo dalam mengakses informasi cuaca secara real-time. Sistem ini mengintegrasikan 
+                data dari OpenWeatherMap API untuk memberikan informasi yang akurat dan terpercaya.
+            </p>
+            <p>
+                Tujuan utama E-Cuaca adalah:
+            </p>
+            <ul class="benefits-list">
+                <li>
+                    <i class="fas fa-cloud-sun"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">Menyediakan Informasi Cuaca Real-Time</div>
+                        <div class="benefits-list-desc">Data cuaca terkini setiap saat tanpa perlu menunggu</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-lightbulb"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">Membantu Pengambilan Keputusan</div>
+                        <div class="benefits-list-desc">Warga dapat merencanakan aktivitas harian dengan lebih baik</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-bell"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">Memberikan Peringatan Dini</div>
+                        <div class="benefits-list-desc">Notifikasi otomatis untuk kondisi cuaca ekstrem</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Manfaat bagi Warga -->
+        <div class="about-section">
+            <h2>
+                <i class="fas fa-heart"></i>
+                Manfaat bagi Warga Desa Sumberejo
+            </h2>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⚠️</div>
+                    <h3>Kewaspadaan Cuaca Ekstrem</h3>
+                    <p>
+                        Meningkatkan kewaspadaan warga terhadap kondisi cuaca berbahaya seperti hujan lebat, 
+                        badai, atau angin kencang.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🌾</div>
+                    <h3>Panduan Aktivitas Bertani</h3>
+                    <p>
+                        Membantu petani menentukan waktu terbaik untuk melakukan aktivitas bertani, 
+                        menjemur hasil panen, dan merawat tanaman.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Data Mingguan & Prediksi</h3>
+                    <p>
+                        Menyediakan data historis cuaca mingguan dan prediksi 5 hari ke depan untuk 
+                        perencanaan yang lebih baik.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Akses Mudah & Cepat</h3>
+                    <p>
+                        Sistem yang user-friendly dan responsif dapat diakses dari perangkat apa pun 
+                        dengan koneksi internet.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">💧</div>
+                    <h3>Informasi Detail</h3>
+                    <p>
+                        Menampilkan berbagai parameter cuaca seperti suhu, kelembapan, kecepatan angin, 
+                        dan prediksi hujan.
+                    </p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Update Real-Time</h3>
+                    <p>
+                        Data diperbarui secara otomatis setiap 10 menit untuk memastikan informasi 
+                        selalu akurat dan terkini.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fitur-Fitur Unggulan -->
+        <div class="about-section">
+            <h2>
+                <i class="fas fa-star"></i>
+                Fitur-Fitur Unggulan
+            </h2>
+            <ul class="benefits-list">
+                <li>
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">Mode Darurat Cuaca (High Impact)</div>
+                        <div class="benefits-list-desc">
+                            Banner peringatan otomatis muncul ketika ada kondisi cuaca berbahaya 
+                            (hujan lebat, angin kencang, badai).
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-tasks"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">Rekomendasi Aktivitas</div>
+                        <div class="benefits-list-desc">
+                            Sistem memberikan rekomendasi aktivitas yang cocok dilakukan berdasarkan 
+                            kondisi cuaca saat ini.
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-chart-bar"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">Statistik Mingguan</div>
+                        <div class="benefits-list-desc">
+                            Ringkasan cuaca mingguan menampilkan hari terpanas, terdingin, dan paling 
+                            hujan selama 7 hari.
+                        </div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-calendar-alt"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">Prediksi 5 Hari</div>
+                        <div class="benefits-list-desc">
+                            Forecasting cuaca yang akurat untuk 5 hari ke depan dengan detail 
+                            suhu, hujan, dan kondisi cuaca.
+                        </div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Tim Pengembang -->
+        <div class="about-section team-section">
+            <h2>
+                <i class="fas fa-users"></i>
+                Tim Pengembang
+            </h2>
+            <p>E-Cuaca dikembangkan sebagai bagian dari Program KKN (Kuliah Kerja Nyata) untuk Desa Sumberejo.</p>
+
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="team-member-icon">👨‍💻</div>
+                    <div class="team-member-name">Tim Pengembang</div>
+                    <div class="team-member-role">Mahasiswa KKN</div>
+                </div>
+                <div class="team-member">
+                    <div class="team-member-icon">🏢</div>
+                    <div class="team-member-name">Desa Sumberejo</div>
+                    <div class="team-member-role">Mitra Implementasi</div>
+                </div>
+                <div class="team-member">
+                    <div class="team-member-icon">🎓</div>
+                    <div class="team-member-name">Universitas</div>
+                    <div class="team-member-role">Institusi Pendidikan</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Teknologi yang Digunakan -->
+        <div class="about-section">
+            <h2>
+                <i class="fas fa-code"></i>
+                Teknologi yang Digunakan
+            </h2>
+            <ul class="benefits-list">
+                <li>
+                    <i class="fab fa-python"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">Django Framework</div>
+                        <div class="benefits-list-desc">Backend framework Python yang powerful dan scalable</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-database"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">OpenWeatherMap API</div>
+                        <div class="benefits-list-desc">Sumber data cuaca real-time yang akurat dan terpercaya</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fab fa-bootstrap"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">Bootstrap & CSS3</div>
+                        <div class="benefits-list-desc">Frontend framework untuk desain responsif dan modern</div>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-globe"></i>
+                    <div class="benefits-list-content">
+                        <div class="benefits-list-title">HTML5 & JavaScript</div>
+                        <div class="benefits-list-desc">Teknologi web standard untuk interface yang interaktif</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Informasi Lokasi -->
+        <div class="about-section">
+            <h2>
+                <i class="fas fa-map-marker-alt"></i>
+                Lokasi Monitoring
+            </h2>
+            <p>
+                <strong>Desa Sumberejo</strong><br>
+                Desa Sumberejo, Kecamatan Pagelaran, Kabupaten Pringsewu, Lampung, Indonesia
+            </p>
+            <div class="contact-info">
+                <h3>Kontak & Informasi Lebih Lanjut</h3>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <span>Hubungi desa setempat untuk informasi lebih lanjut</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <span>Kecamatan Pagelaran, Kabupaten Pringsewu, Lampung</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Info -->
+        <div style="text-align: center; padding: 30px; color: var(--gray);">
+            <p>
+                <strong>E-Cuaca © 2026</strong><br>
+                Sistem Monitoring Cuaca Real-Time untuk Desa Sumberejo<br>
+                <small>Dikembangkan untuk Program KKN 2026</small>
+            </p>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
